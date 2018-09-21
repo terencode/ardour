@@ -466,6 +466,7 @@ private:
 
 	boost::shared_ptr<Knob>* knobs_by_column(uint8_t col, boost::shared_ptr<Knob>* knob_col);
 	void update_knob_led(uint8_t n);
+	void update_knob_led_by_id (uint8_t id, LEDColor color);
 
 	void knob_sendA(uint8_t n);
 	void knob_sendB(uint8_t n);

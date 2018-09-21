@@ -360,6 +360,21 @@ LaunchControlXL::knobs_by_column(uint8_t col, boost::shared_ptr<Knob>* knob_col)
 }
 
 void
+LaunchControlXL::update_knob_led_by_id (uint8_t id, LEDColor color)
+{
+
+	boost::shared_ptr<Knob> knob = 0;
+	IDKnobMap::iterator k = id_knob_map.find(static_cast<KnobID>(id));
+
+	if (k != id_knob_map.end()) {
+		knob = k->second;
+	}
+
+	knob->set_color(color);
+	write (knob->state_msg());
+}
+
+void
 LaunchControlXL::update_knob_led(uint8_t n)
 {
 	LEDColor color;
@@ -465,7 +480,6 @@ LaunchControlXL::update_track_control_led(uint8_t n)
 					b->set_color(Off);
 				}
 				break;
-
 			default:
 			break;
 		}
@@ -526,7 +540,6 @@ LaunchControlXL::master_send_changed(uint32_t n)
 	} else {
 		master_send_led_bank();
 	}
-
 }
 
 void
