@@ -38,37 +38,40 @@ LaunchControlXL::build_maps ()
 
 	boost::shared_ptr<Knob> knob;
 
-	#define MAKE_KNOB(i,cc,index,a) \
-		knob.reset (new Knob ((i), (cc), (index), (a), (*this))); \
+
+
+	#define MAKE_KNOB(i,cc,index,color,c_on,c_off,a) \
+		knob.reset (new Knob ((i), (cc), (index), (color), (c_on), (c_off), (a), (*this))); \
 		cc_knob_map.insert (std::make_pair (knob->controller_number(), knob)); \
-		id_knob_map.insert (std::make_pair (knob->id(), knob))
+		id_knob_map.insert (std::make_pair (knob->id(), knob));
 
-	MAKE_KNOB (SendA1, 13, 0, &LaunchControlXL::knob_sendA1);
-	MAKE_KNOB (SendA2, 14, 1, &LaunchControlXL::knob_sendA2);
-	MAKE_KNOB (SendA3, 15, 2, &LaunchControlXL::knob_sendA3);
-	MAKE_KNOB (SendA4, 16, 3, &LaunchControlXL::knob_sendA4);
-	MAKE_KNOB (SendA5, 17, 4, &LaunchControlXL::knob_sendA5);
-	MAKE_KNOB (SendA6, 18, 5, &LaunchControlXL::knob_sendA6);
-	MAKE_KNOB (SendA7, 19, 6, &LaunchControlXL::knob_sendA7);
-	MAKE_KNOB (SendA8, 20, 7, &LaunchControlXL::knob_sendA8);
+	MAKE_KNOB (SendA1, 13, 0, RedLow, RedFull, RedLow, &LaunchControlXL::knob_sendA1);
+	MAKE_KNOB (SendA2, 14, 1, YellowLow, YellowFull, YellowLow, &LaunchControlXL::knob_sendA2);
+	MAKE_KNOB (SendA3, 15, 2, GreenLow, GreenFull, GreenLow, &LaunchControlXL::knob_sendA3);
+	MAKE_KNOB (SendA4, 16, 3, AmberLow, AmberFull, AmberLow, &LaunchControlXL::knob_sendA4);
 
-	MAKE_KNOB (SendB1, 29, 8, &LaunchControlXL::knob_sendB1);
-	MAKE_KNOB (SendB2, 30, 9, &LaunchControlXL::knob_sendB2);
-	MAKE_KNOB (SendB3, 31, 10, &LaunchControlXL::knob_sendB3);
-	MAKE_KNOB (SendB4, 32, 11, &LaunchControlXL::knob_sendB4);
-	MAKE_KNOB (SendB5, 33, 12, &LaunchControlXL::knob_sendB5);
-	MAKE_KNOB (SendB6, 34, 13, &LaunchControlXL::knob_sendB6);
-	MAKE_KNOB (SendB7, 35, 14, &LaunchControlXL::knob_sendB7);
-	MAKE_KNOB (SendB8, 36, 15, &LaunchControlXL::knob_sendB8);
+	MAKE_KNOB (SendA5, 17, 4, RedLow, RedFull, RedLow, &LaunchControlXL::knob_sendA5);
+	MAKE_KNOB (SendA6, 18, 5, YellowLow, YellowFull, YellowLow, &LaunchControlXL::knob_sendA6);
+	MAKE_KNOB (SendA7, 19, 6, GreenLow, GreenFull, GreenLow, &LaunchControlXL::knob_sendA7);
+	MAKE_KNOB (SendA8, 20, 7, AmberLow, AmberFull, AmberLow, &LaunchControlXL::knob_sendA8);
 
-	MAKE_KNOB (Pan1, 49, 16, &LaunchControlXL::knob_pan1);
-	MAKE_KNOB (Pan2, 50, 17, &LaunchControlXL::knob_pan2);
-	MAKE_KNOB (Pan3, 51, 18, &LaunchControlXL::knob_pan3);
-	MAKE_KNOB (Pan4, 52, 19, &LaunchControlXL::knob_pan4);
-	MAKE_KNOB (Pan5, 53, 20, &LaunchControlXL::knob_pan5);
-	MAKE_KNOB (Pan6, 54, 21, &LaunchControlXL::knob_pan6);
-	MAKE_KNOB (Pan7, 55, 22, &LaunchControlXL::knob_pan7);
-	MAKE_KNOB (Pan8, 56, 23, &LaunchControlXL::knob_pan8);
+	MAKE_KNOB (SendB1, 29, 8, RedLow, RedFull, RedLow, &LaunchControlXL::knob_sendB1);
+	MAKE_KNOB (SendB2, 30, 9, YellowLow, YellowFull, YellowLow, &LaunchControlXL::knob_sendB2);
+	MAKE_KNOB (SendB3, 31, 10, GreenLow, GreenFull, GreenLow, &LaunchControlXL::knob_sendB3);
+	MAKE_KNOB (SendB4, 32, 11, AmberLow, AmberFull, AmberLow, &LaunchControlXL::knob_sendB4);
+	MAKE_KNOB (SendB5, 33, 12, RedLow, RedFull, RedLow, &LaunchControlXL::knob_sendB5);
+	MAKE_KNOB (SendB6, 34, 13, YellowLow, YellowFull, YellowLow, &LaunchControlXL::knob_sendB6);
+	MAKE_KNOB (SendB7, 35, 14, GreenLow, GreenFull, GreenLow, &LaunchControlXL::knob_sendB7);
+	MAKE_KNOB (SendB8, 36, 15, AmberLow, AmberFull, AmberLow, &LaunchControlXL::knob_sendB8);
+
+	MAKE_KNOB (Pan1, 49, 16, RedLow, RedFull, RedLow, &LaunchControlXL::knob_pan1);
+	MAKE_KNOB (Pan2, 50, 17, YellowLow, YellowFull, YellowLow, &LaunchControlXL::knob_pan2);
+	MAKE_KNOB (Pan3, 51, 18, GreenLow, GreenFull, GreenLow, &LaunchControlXL::knob_pan3);
+	MAKE_KNOB (Pan4, 52, 19, AmberLow, AmberFull, AmberLow, &LaunchControlXL::knob_pan4);
+	MAKE_KNOB (Pan5, 53, 20, RedLow, RedFull, RedLow, &LaunchControlXL::knob_pan5);
+	MAKE_KNOB (Pan6, 54, 21, YellowLow, YellowFull, YellowLow, &LaunchControlXL::knob_pan6);
+	MAKE_KNOB (Pan7, 55, 22, GreenLow, GreenFull, GreenLow, &LaunchControlXL::knob_pan7);
+	MAKE_KNOB (Pan8, 56, 23, AmberLow, AmberFull, AmberLow, &LaunchControlXL::knob_pan8);
 
 	/* Faders */
 
@@ -375,61 +378,20 @@ LaunchControlXL::update_knob_led_by_id (uint8_t id, LEDColor color)
 }
 
 void
-LaunchControlXL::update_knob_led(uint8_t n)
+LaunchControlXL::update_knob_led_by_strip(uint8_t n)
 {
 	LEDColor color;
-
-	uint32_t absolute_strip_num = (n + bank_start) % 8;
-
-	if (stripable[n]) {
-		switch (absolute_strip_num) {
-			case 0:
-			case 4:
-				if (stripable[n]->is_selected()) {
-					color = RedFull;
-				} else {
-					color = RedLow;
-				}
-				break;
-
-			case 1:
-			case 5:
-				if (stripable[n]->is_selected()) {
-					color = YellowFull;
-				} else {
-					color = YellowLow;
-				}
-				break;
-
-			case 2:
-			case 6:
-				if (stripable[n]->is_selected()) {
-					color = GreenFull;
-				} else {
-					color = GreenLow;
-				}
-				break;
-
-			case 3:
-			case 7:
-				if (stripable[n]->is_master()) {
-					color = RedFull;
-				} else {
-					if (stripable[n]->is_selected()) {
-						color = AmberFull;
-					} else {
-						color = AmberLow;
-					}
-				}
-		}
-	}
 
 	boost::shared_ptr<Knob> knobs_col[3];
 	knobs_by_column(n, knobs_col);
 
-	for  (uint8_t s = 0; s < 3; ++s)
-	{
+	for  (uint8_t s = 0; s < 3; ++s) {
 		if (stripable[n]) {
+			if (stripable[n]->is_selected()) {
+				color = knobs_col[s]->color_enabled();
+			} else {
+				color = knobs_col[s]->color_disabled();
+			}
 			knobs_col[s]->set_color(color);
 		} else {
 			knobs_col[s]->set_color(Off);

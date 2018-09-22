@@ -80,8 +80,6 @@ LaunchControlXL::LaunchControlXL (ARDOUR::Session& s)
 	lcxl = this;
 	/* we're going to need this */
 
-	build_maps ();
-
 	/* master cannot be removed, so no need to connect to going-away signal */
 	master = session->master_out ();
 
@@ -102,8 +100,6 @@ LaunchControlXL::LaunchControlXL (ARDOUR::Session& s)
 
 	session->RouteAdded.connect (session_connections, MISSING_INVALIDATOR, boost::bind (&LaunchControlXL::stripables_added, this), lcxl);
 	session->vca_manager().VCAAdded.connect (session_connections, MISSING_INVALIDATOR, boost::bind (&LaunchControlXL::stripables_added, this), lcxl);
-
-	switch_bank (bank_start);
 }
 
 LaunchControlXL::~LaunchControlXL ()
@@ -147,7 +143,12 @@ LaunchControlXL::begin_using_device ()
 
 	connect_session_signals ();
 
+	build_maps();
+
+	reset(template_number());
+
 	init_buttons (true);
+	init_knobs (true);
 
 	in_use = true;
 
@@ -253,10 +254,26 @@ LaunchControlXL::bundles ()
 void
 LaunchControlXL::init_buttons (bool startup)
 {
-	reset(template_number());
-
 	if (startup) {
 		switch_bank(bank_start);
+	}
+}
+
+void
+LaunchControlXL::init_knobs (bool startup)
+{
+/*
+	KnobID knobs[] = { SendA1, SendA2, SendA3, SendA4, SendA5, SendA6, SendA7, SendA8 };
+
+	for (size_t n = 0; n < sizeof (knobs) / sizeof (knobs[0]); ++n) {
+		boost::shared_ptr<Knob> knob = id_knob_map[knobs[n]];
+		DEBUG_TRACE (DEBUG::LaunchControlXL, string_compose ("MAKE KNOB LOOP n:%1\n", n));
+		write (knob->state_msg());
+	}
+	*/
+
+	for (int n = 0; n < 8; ++n) {
+		update_knob_led_by_strip(n);
 	}
 }
 
@@ -780,7 +797,7 @@ LaunchControlXL::stripable_property_change (PropertyChange const& what_changed, 
 		}
 		if (which < 8) {
 			update_track_focus_led ((uint8_t) which);
-			update_knob_led((uint8_t) which);
+			update_knob_led_by_strip((uint8_t) which);
 		}
 	}
 }
@@ -795,6 +812,9 @@ LaunchControlXL::switch_template (uint8_t t)
 void
 LaunchControlXL::switch_bank (uint32_t base)
 {
+	DEBUG_TRACE (DEBUG::LaunchControlXL, string_compose ("switch_bank bank_start:%1\n", bank_start));
+	DEBUG_TRACE (DEBUG::LaunchControlXL, string_compose ("switch_bank base:%1\n", base));
+
 	boost::shared_ptr<SelectButton> sl = boost::dynamic_pointer_cast<SelectButton>(id_controller_button_map[SelectLeft]);
 	boost::shared_ptr<SelectButton> sr = boost::dynamic_pointer_cast<SelectButton>(id_controller_button_map[SelectRight]);
 
@@ -857,7 +877,7 @@ LaunchControlXL::switch_bank (uint32_t base)
 		}
 		update_track_focus_led(n);
 		button_track_mode(track_mode());
-		update_knob_led(n);
+		update_knob_led_by_strip(n);
 	}
 }
 

@@ -320,12 +320,23 @@ public:
 			, MultiColorLED(index, Off, l)
 			, _id(id) {} // knob 50/50 value
 
+		Knob(KnobID id, uint8_t cn, uint8_t index, LEDColor color, LEDColor c_on, LEDColor c_off, void (LaunchControlXL::*action)(), LaunchControlXL &l)
+			: Controller(cn, 64, action)
+			, MultiColorLED(index, color, l)
+			, _id(id)
+			, _color_enabled (c_on)
+			, _color_disabled (c_off) {} // knob 50/50 value
+
 		KnobID id() const { return _id; }
+		LEDColor color_enabled() const { return _color_enabled; }
+		LEDColor color_disabled() const { return _color_disabled; }
 
 		MidiByteArray state_msg(bool light = true) const;
 
 		private:
 		KnobID _id;
+		LEDColor _color_enabled;
+		LEDColor _color_disabled;
 	};
 
 public:
@@ -427,6 +438,7 @@ private:
 	void start_press_timeout(boost::shared_ptr<Button> , ButtonID);
 
 	void init_buttons(bool startup);
+	void init_knobs(bool startup);
 
 	void switch_template(uint8_t t);
 
@@ -465,8 +477,8 @@ private:
 	/* Knob methods */
 
 	boost::shared_ptr<Knob>* knobs_by_column(uint8_t col, boost::shared_ptr<Knob>* knob_col);
-	void update_knob_led(uint8_t n);
-	void update_knob_led_by_id (uint8_t id, LEDColor color);
+	void update_knob_led_by_strip(uint8_t n);
+	void update_knob_led_by_id(uint8_t id, LEDColor color);
 
 	void knob_sendA(uint8_t n);
 	void knob_sendB(uint8_t n);
