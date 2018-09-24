@@ -441,6 +441,7 @@ private:
 	void init_knobs(bool startup);
 
 	void switch_template(uint8_t t);
+	void filter_stripables (ARDOUR::StripableList& strips) const;
 
 	void build_maps();
 

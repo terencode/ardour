@@ -32,15 +32,19 @@
 #include "ardour/amp.h"
 #include "ardour/async_midi_port.h"
 #include "ardour/audioengine.h"
+#include "ardour/audio_track.h"
 #include "ardour/debug.h"
 #include "ardour/midiport_manager.h"
 #include "ardour/midi_track.h"
 #include "ardour/midi_port.h"
+#include "ardour/route.h"
 #include "ardour/session.h"
 #include "ardour/solo_isolate_control.h"
 #include "ardour/tempo.h"
 #include "ardour/types_convert.h"
+#include "ardour/vca.h"
 #include "ardour/vca_manager.h"
+
 
 
 #include "gtkmm2ext/gui_thread.h"
@@ -419,8 +423,12 @@ LaunchControlXL::handle_midi_sysex (MIDI::Parser&, MIDI::byte* raw_bytes, size_t
 
 	switch (msg[6]) {
 	case 0x77: /* template change */
-		DEBUG_TRACE (DEBUG::LaunchControlXL, string_compose ("Template change: %1 n", msg[7]));
+		DEBUG_TRACE (DEBUG::LaunchControlXL, string_compose ("Template change: %1\n", (int)msg[7]));
 		_template_number = msg[7];
+		init_buttons(false);
+		init_knobs(false);
+		bank_start = 0;
+		switch_bank(bank_start);
 		break;
 	}
 }
@@ -779,6 +787,7 @@ LaunchControlXL::input_port()
 void
 LaunchControlXL::stripable_selection_changed () // we don't need it but it's needs to be declared...
 {
+	switch_bank (bank_start);
 }
 
 
@@ -802,6 +811,129 @@ LaunchControlXL::stripable_property_change (PropertyChange const& what_changed, 
 	}
 }
 
+/* strip filter definitions */
+
+static bool flt_default (boost::shared_ptr<Stripable> s) {
+	if (s->is_master() || s->is_monitor()) {
+		return false;
+	}
+	return (boost::dynamic_pointer_cast<Route>(s) != 0 ||
+			boost::dynamic_pointer_cast<VCA>(s) != 0);
+}
+
+static bool flt_track (boost::shared_ptr<Stripable> s) {
+	return boost::dynamic_pointer_cast<Track>(s) != 0;
+}
+
+static bool flt_auxbus (boost::shared_ptr<Stripable> s) {
+	if (s->is_master() || s->is_monitor()) {
+		return false;
+	}
+	if (boost::dynamic_pointer_cast<Route>(s) == 0) {
+		return false;
+	}
+#ifdef MIXBUS
+	if (s->mixbus () > 0) {
+		return false;
+	}
+#endif
+	return boost::dynamic_pointer_cast<Track>(s) == 0;
+}
+
+#ifdef MIXBUS
+static bool flt_mixbus (boost::shared_ptr<Stripable> s) {
+	if (s->mixbus () == 0) {
+		return false;
+	}
+	return boost::dynamic_pointer_cast<Track>(s) == 0;
+}
+#endif
+
+static bool flt_vca (boost::shared_ptr<Stripable> s) {
+	return boost::dynamic_pointer_cast<VCA>(s) != 0;
+}
+
+static bool flt_selected (boost::shared_ptr<Stripable> s) {
+	return s->is_selected ();
+}
+
+static bool flt_rec_armed (boost::shared_ptr<Stripable> s) {
+	boost::shared_ptr<Track> t = boost::dynamic_pointer_cast<Track>(s);
+	if (!t) {
+		return false;
+	}
+	return t->rec_enable_control ()->get_value () > 0.;
+}
+
+static bool flt_mains (boost::shared_ptr<Stripable> s) {
+	return (s->is_master() || s->is_monitor());
+}
+
+static bool flt_all (boost::shared_ptr<Stripable> s) {
+	if (s->is_monitor()) {
+		return false;
+	}
+	return (boost::dynamic_pointer_cast<Route>(s) != 0 ||
+			boost::dynamic_pointer_cast<VCA>(s) != 0);
+}
+
+void
+LaunchControlXL::filter_stripables(StripableList& strips) const
+{
+	typedef bool (*FilterFunction)(boost::shared_ptr<Stripable>);
+	FilterFunction flt;
+
+	switch ((int)template_number()) {
+		case 9:
+			flt = &flt_track;
+			break;
+		case 10:
+			flt = &flt_auxbus;
+			break;
+#ifdef MIXBUS
+		case 11:
+			flt = &flt_mixbus;
+			break;
+		case 12:
+			flt = &flt_vca;
+			break;
+#else
+		case 11:
+			flt = &flt_vca;
+			break;
+		case 12:
+			flt = &flt_rec_armed;
+#endif
+		case 13:
+			flt = &flt_selected;
+			break;
+		case 14:
+			flt = &flt_all;
+			 break;
+		case 15:
+			flt = &flt_mains;
+			break;
+		default:
+			// fall through
+		case 8:
+			flt = &flt_default;
+			break;
+	}
+
+	StripableList all;
+	session->get_stripables (all);
+
+	for (StripableList::const_iterator s = all.begin(); s != all.end(); ++s) {
+		if ((*s)->is_auditioner ()) { continue; }
+		if ((*s)->is_hidden ()) { continue; }
+
+		if ((*flt)(*s)) {
+			strips.push_back (*s);
+		}
+	}
+	strips.sort (Stripable::Sorter(true));
+}
+
 void
 LaunchControlXL::switch_template (uint8_t t)
 {
@@ -815,65 +947,87 @@ LaunchControlXL::switch_bank (uint32_t base)
 	DEBUG_TRACE (DEBUG::LaunchControlXL, string_compose ("switch_bank bank_start:%1\n", bank_start));
 	DEBUG_TRACE (DEBUG::LaunchControlXL, string_compose ("switch_bank base:%1\n", base));
 
+	StripableList strips;
+	filter_stripables (strips);
+
 	boost::shared_ptr<SelectButton> sl = boost::dynamic_pointer_cast<SelectButton>(id_controller_button_map[SelectLeft]);
 	boost::shared_ptr<SelectButton> sr = boost::dynamic_pointer_cast<SelectButton>(id_controller_button_map[SelectRight]);
 
-	/* work backwards so we can tell if we should actually switch banks */
-
 	boost::shared_ptr<Stripable> s[8];
-	uint32_t different = 0;
+	boost::shared_ptr<Stripable> next_base;
+	uint32_t stripable_counter = get_amount_of_tracks();
+	uint32_t skip = base;
+	uint32_t n = 0;
 
-
-	int stripable_counter = get_amount_of_tracks();
-
-	for (int n = 0; n < stripable_counter; ++n) {
-		s[n] = session->get_remote_nth_stripable (base+n, PresentationInfo::Flag (PresentationInfo::Route|PresentationInfo::VCA));
-		if (s[n] != stripable[n]) {
-			different++;
+	for (StripableList::const_iterator strip = strips.begin(); strip != strips.end(); ++strip) {
+		DEBUG_TRACE (DEBUG::LaunchControlXL, string_compose ("StripableList iterator - skip: %1, n: %2\n", skip, n));
+		if (skip > 0) {
+			--skip;
+			continue;
 		}
+
+		if (n < stripable_counter) {
+			DEBUG_TRACE (DEBUG::LaunchControlXL, string_compose ("StripableList iterator - assigning stripable for n: %1\n", n));
+			s[n] = *strip;
+		}
+
+		if (n == base + 8) {
+			DEBUG_TRACE (DEBUG::LaunchControlXL, string_compose ("StripableList iterator - n: %1. Filling next_base\n", n));
+			next_base = *strip;
+			break;
+		}
+
+		++n;
 	}
 
 	if (!s[0]) {
 		/* not even the first stripable exists, do nothing */
+		DEBUG_TRACE (DEBUG::LaunchControlXL, "s[0] does not exist - doing nothing\n");
 		return;
 	}
 
 	if (sl && sr) {
-		boost::shared_ptr<Stripable> next_base = session->get_remote_nth_stripable (base+8, PresentationInfo::Flag (PresentationInfo::Route|PresentationInfo::VCA));
-		write(sl->state_msg((base)));
-		write(sr->state_msg((next_base != 0)));
+		write(sl->state_msg(base));
+		write(sr->state_msg(next_base != 0));
 	}
 
 	stripable_connections.drop_connections ();
 
-	for (int n = 0; n < stripable_counter; ++n) {
+	for (uint32_t n = 0; n < stripable_counter; ++n) {
 		stripable[n] = s[n];
 	}
-
-	/* at least one stripable in this bank */
 
 	bank_start = base;
 
 	for (int n = 0; n < 8; ++n) {
-
+		DEBUG_TRACE (DEBUG::LaunchControlXL, string_compose ("Binding Callbacks for n: %1\n", n));
 		if (stripable[n]) {
-			/* stripable goes away? refill the bank, starting at the same point */
+			DEBUG_TRACE (DEBUG::LaunchControlXL, string_compose ("Binding Callbacks stripable[%1] exists\n", n));
 
-			stripable[n]->DropReferences.connect (stripable_connections, MISSING_INVALIDATOR, boost::bind (&LaunchControlXL::switch_bank, this, bank_start), lcxl);
-			stripable[n]->presentation_info().PropertyChanged.connect (stripable_connections, MISSING_INVALIDATOR, boost::bind (&LaunchControlXL::stripable_property_change, this, _1, n), lcxl);
-			stripable[n]->solo_control()->Changed.connect (stripable_connections, MISSING_INVALIDATOR, boost::bind (&LaunchControlXL::solo_changed, this, n), lcxl);
-			stripable[n]->mute_control()->Changed.connect (stripable_connections, MISSING_INVALIDATOR, boost::bind (&LaunchControlXL::mute_changed, this, n), lcxl);
+			stripable[n]->DropReferences.connect (stripable_connections, MISSING_INVALIDATOR,
+					boost::bind (&LaunchControlXL::switch_bank, this, bank_start), lcxl);
+			stripable[n]->presentation_info().PropertyChanged.connect (stripable_connections, MISSING_INVALIDATOR,
+					boost::bind (&LaunchControlXL::stripable_property_change, this, _1, n), lcxl);
+			stripable[n]->solo_control()->Changed.connect (stripable_connections, MISSING_INVALIDATOR,
+					boost::bind (&LaunchControlXL::solo_changed, this, n), lcxl);
+			stripable[n]->mute_control()->Changed.connect (stripable_connections, MISSING_INVALIDATOR,
+					boost::bind (&LaunchControlXL::mute_changed, this, n), lcxl);
 			if (stripable[n]->solo_isolate_control()) {	/*VCAs are stripables without isolate solo */
-				stripable[n]->solo_isolate_control()->Changed.connect (stripable_connections, MISSING_INVALIDATOR, boost::bind (&LaunchControlXL::solo_iso_changed, this,n ), lcxl);
+				stripable[n]->solo_isolate_control()->Changed.connect (stripable_connections, MISSING_INVALIDATOR,
+						boost::bind (&LaunchControlXL::solo_iso_changed, this,n ), lcxl);
 			}
 #ifdef MIXBUS
 			if (stripable[n]->master_send_enable_controllable()) {
-				stripable[n]->master_send_enable_controllable()->Changed.connect (stripable_connections, MISSING_INVALIDATOR, boost::bind (&LaunchControlXL::master_send_changed, this,n ), lcxl);
+				stripable[n]->master_send_enable_controllable()->Changed.connect (stripable_connections, MISSING_INVALIDATOR,
+						boost::bind (&LaunchControlXL::master_send_changed, this,n ), lcxl);
 			}
 #endif
 			if (stripable[n]->rec_enable_control()) {
-				stripable[n]->rec_enable_control()->Changed.connect (stripable_connections, MISSING_INVALIDATOR, boost::bind (&LaunchControlXL::rec_changed, this, n), lcxl);
+				stripable[n]->rec_enable_control()->Changed.connect (stripable_connections, MISSING_INVALIDATOR,
+						boost::bind (&LaunchControlXL::rec_changed, this, n), lcxl);
+
 			}
+
 		}
 		update_track_focus_led(n);
 		button_track_mode(track_mode());
