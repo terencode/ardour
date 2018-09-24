@@ -265,13 +265,46 @@ public:
 				void (LaunchControlXL::*press)(), LaunchControlXL& l)
 			: NoteButton(id, nn, press), MultiColorLED(index, color, l) {}
 
+		TrackButton(ButtonID id, uint8_t nn, uint8_t index,
+				void (LaunchControlXL::*press)(),
+				void (LaunchControlXL::*release)(),
+				LaunchControlXL& l)
+			: NoteButton(id, nn, press, release), MultiColorLED(index, Off, l) {}
+
 		TrackButton(ButtonID id, uint8_t nn, uint8_t index, LEDColor color,
 				void (LaunchControlXL::*press)(),
 				void (LaunchControlXL::*release)(),
 				LaunchControlXL& l)
 			: NoteButton(id, nn, press, release), MultiColorLED(index, color, l) {}
 
+		TrackButton(ButtonID id, uint8_t nn, uint8_t index, LEDColor c_on, LEDColor c_off,
+				void (LaunchControlXL::*press)(),
+				LaunchControlXL& l)
+			: NoteButton(id, nn, press)
+			, MultiColorLED(index, Off, l)
+			, _color_enabled (c_on)
+			, _color_disabled (c_off) {}
+
+
+		TrackButton(ButtonID id, uint8_t nn, uint8_t index, LEDColor c_on, LEDColor c_off,
+				void (LaunchControlXL::*press)(),
+				void (LaunchControlXL::*release)(),
+				LaunchControlXL& l)
+			: NoteButton(id, nn, press, release)
+			, MultiColorLED(index, Off, l)
+			, _color_enabled (c_on)
+			, _color_disabled (c_off) {}
+
+		LEDColor color_enabled() const { return _color_enabled; }
+		LEDColor color_disabled() const { return _color_disabled; }
+		void set_color_enabled (LEDColor c_on) { _color_enabled = c_on; }
+		void set_color_disabled (LEDColor c_off) { _color_disabled = c_off; }
+
 		MidiByteArray state_msg(bool light = true) const;
+
+		private:
+		LEDColor _color_enabled;
+		LEDColor _color_disabled;
 	};
 
 	struct SelectButton : public ControllerButton, public LED {
@@ -315,14 +348,9 @@ public:
 	};
 
 	struct Knob : public Controller, public MultiColorLED {
-		Knob(KnobID id, uint8_t cn, uint8_t index, void (LaunchControlXL::*action)(), LaunchControlXL &l)
+		Knob(KnobID id, uint8_t cn, uint8_t index, LEDColor c_on, LEDColor c_off, void (LaunchControlXL::*action)(), LaunchControlXL &l)
 			: Controller(cn, 64, action)
 			, MultiColorLED(index, Off, l)
-			, _id(id) {} // knob 50/50 value
-
-		Knob(KnobID id, uint8_t cn, uint8_t index, LEDColor color, LEDColor c_on, LEDColor c_off, void (LaunchControlXL::*action)(), LaunchControlXL &l)
-			: Controller(cn, 64, action)
-			, MultiColorLED(index, color, l)
 			, _id(id)
 			, _color_enabled (c_on)
 			, _color_disabled (c_off) {} // knob 50/50 value

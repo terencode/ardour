@@ -40,38 +40,38 @@ LaunchControlXL::build_maps ()
 
 
 
-	#define MAKE_KNOB(i,cc,index,color,c_on,c_off,a) \
-		knob.reset (new Knob ((i), (cc), (index), (color), (c_on), (c_off), (a), (*this))); \
+	#define MAKE_KNOB(i,cc,index,c_on,c_off,a) \
+		knob.reset (new Knob ((i), (cc), (index), (c_on), (c_off), (a), (*this))); \
 		cc_knob_map.insert (std::make_pair (knob->controller_number(), knob)); \
 		id_knob_map.insert (std::make_pair (knob->id(), knob));
 
-	MAKE_KNOB (SendA1, 13, 0, RedLow, RedFull, RedLow, &LaunchControlXL::knob_sendA1);
-	MAKE_KNOB (SendA2, 14, 1, YellowLow, YellowFull, YellowLow, &LaunchControlXL::knob_sendA2);
-	MAKE_KNOB (SendA3, 15, 2, GreenLow, GreenFull, GreenLow, &LaunchControlXL::knob_sendA3);
-	MAKE_KNOB (SendA4, 16, 3, AmberLow, AmberFull, AmberLow, &LaunchControlXL::knob_sendA4);
+	MAKE_KNOB (SendA1, 13, 0, RedFull, RedLow, &LaunchControlXL::knob_sendA1);
+	MAKE_KNOB (SendA2, 14, 1, YellowFull, YellowLow, &LaunchControlXL::knob_sendA2);
+	MAKE_KNOB (SendA3, 15, 2, GreenFull, GreenLow, &LaunchControlXL::knob_sendA3);
+	MAKE_KNOB (SendA4, 16, 3, AmberFull, AmberLow, &LaunchControlXL::knob_sendA4);
 
-	MAKE_KNOB (SendA5, 17, 4, RedLow, RedFull, RedLow, &LaunchControlXL::knob_sendA5);
-	MAKE_KNOB (SendA6, 18, 5, YellowLow, YellowFull, YellowLow, &LaunchControlXL::knob_sendA6);
-	MAKE_KNOB (SendA7, 19, 6, GreenLow, GreenFull, GreenLow, &LaunchControlXL::knob_sendA7);
-	MAKE_KNOB (SendA8, 20, 7, AmberLow, AmberFull, AmberLow, &LaunchControlXL::knob_sendA8);
+	MAKE_KNOB (SendA5, 17, 4, RedFull, RedLow, &LaunchControlXL::knob_sendA5);
+	MAKE_KNOB (SendA6, 18, 5, YellowFull, YellowLow, &LaunchControlXL::knob_sendA6);
+	MAKE_KNOB (SendA7, 19, 6, GreenFull, GreenLow, &LaunchControlXL::knob_sendA7);
+	MAKE_KNOB (SendA8, 20, 7, AmberFull, AmberLow, &LaunchControlXL::knob_sendA8);
 
-	MAKE_KNOB (SendB1, 29, 8, RedLow, RedFull, RedLow, &LaunchControlXL::knob_sendB1);
-	MAKE_KNOB (SendB2, 30, 9, YellowLow, YellowFull, YellowLow, &LaunchControlXL::knob_sendB2);
-	MAKE_KNOB (SendB3, 31, 10, GreenLow, GreenFull, GreenLow, &LaunchControlXL::knob_sendB3);
-	MAKE_KNOB (SendB4, 32, 11, AmberLow, AmberFull, AmberLow, &LaunchControlXL::knob_sendB4);
-	MAKE_KNOB (SendB5, 33, 12, RedLow, RedFull, RedLow, &LaunchControlXL::knob_sendB5);
-	MAKE_KNOB (SendB6, 34, 13, YellowLow, YellowFull, YellowLow, &LaunchControlXL::knob_sendB6);
-	MAKE_KNOB (SendB7, 35, 14, GreenLow, GreenFull, GreenLow, &LaunchControlXL::knob_sendB7);
-	MAKE_KNOB (SendB8, 36, 15, AmberLow, AmberFull, AmberLow, &LaunchControlXL::knob_sendB8);
+	MAKE_KNOB (SendB1, 29, 8, RedFull, RedLow, &LaunchControlXL::knob_sendB1);
+	MAKE_KNOB (SendB2, 30, 9, YellowFull, YellowLow, &LaunchControlXL::knob_sendB2);
+	MAKE_KNOB (SendB3, 31, 10, GreenFull, GreenLow, &LaunchControlXL::knob_sendB3);
+	MAKE_KNOB (SendB4, 32, 11, AmberFull, AmberLow, &LaunchControlXL::knob_sendB4);
+	MAKE_KNOB (SendB5, 33, 12, RedFull, RedLow, &LaunchControlXL::knob_sendB5);
+	MAKE_KNOB (SendB6, 34, 13, YellowFull, YellowLow, &LaunchControlXL::knob_sendB6);
+	MAKE_KNOB (SendB7, 35, 14, GreenFull, GreenLow, &LaunchControlXL::knob_sendB7);
+	MAKE_KNOB (SendB8, 36, 15, AmberFull, AmberLow, &LaunchControlXL::knob_sendB8);
 
-	MAKE_KNOB (Pan1, 49, 16, RedLow, RedFull, RedLow, &LaunchControlXL::knob_pan1);
-	MAKE_KNOB (Pan2, 50, 17, YellowLow, YellowFull, YellowLow, &LaunchControlXL::knob_pan2);
-	MAKE_KNOB (Pan3, 51, 18, GreenLow, GreenFull, GreenLow, &LaunchControlXL::knob_pan3);
-	MAKE_KNOB (Pan4, 52, 19, AmberLow, AmberFull, AmberLow, &LaunchControlXL::knob_pan4);
-	MAKE_KNOB (Pan5, 53, 20, RedLow, RedFull, RedLow, &LaunchControlXL::knob_pan5);
-	MAKE_KNOB (Pan6, 54, 21, YellowLow, YellowFull, YellowLow, &LaunchControlXL::knob_pan6);
-	MAKE_KNOB (Pan7, 55, 22, GreenLow, GreenFull, GreenLow, &LaunchControlXL::knob_pan7);
-	MAKE_KNOB (Pan8, 56, 23, AmberLow, AmberFull, AmberLow, &LaunchControlXL::knob_pan8);
+	MAKE_KNOB (Pan1, 49, 16, RedFull, RedLow, &LaunchControlXL::knob_pan1);
+	MAKE_KNOB (Pan2, 50, 17, YellowFull, YellowLow, &LaunchControlXL::knob_pan2);
+	MAKE_KNOB (Pan3, 51, 18, GreenFull, GreenLow, &LaunchControlXL::knob_pan3);
+	MAKE_KNOB (Pan4, 52, 19, AmberFull, AmberLow, &LaunchControlXL::knob_pan4);
+	MAKE_KNOB (Pan5, 53, 20, RedFull, RedLow, &LaunchControlXL::knob_pan5);
+	MAKE_KNOB (Pan6, 54, 21, YellowFull, YellowLow, &LaunchControlXL::knob_pan6);
+	MAKE_KNOB (Pan7, 55, 22, GreenFull, GreenLow, &LaunchControlXL::knob_pan7);
+	MAKE_KNOB (Pan8, 56, 23, AmberFull, AmberLow, &LaunchControlXL::knob_pan8);
 
 	/* Faders */
 
@@ -98,8 +98,13 @@ LaunchControlXL::build_maps ()
 	boost::shared_ptr<NoteButton> note_button;
 
 
-	#define MAKE_TRACK_BUTTON_PRESS(i,nn,index,color,p) \
-		note_button.reset (new TrackButton ((i), (nn), (index), (color), (p), (*this))); \
+	#define MAKE_TRACK_BUTTON_PRESS(i,nn,index,c_on,c_off,p) \
+		note_button.reset (new TrackButton ((i), (nn), (index), (c_on), (c_off), (p), (*this))); \
+		nn_note_button_map.insert (std::make_pair (note_button->note_number(), note_button)); \
+		id_note_button_map.insert (std::make_pair (note_button->id(), note_button))
+	/* Control Buttons in mix mode change their color dynamically so we won't set them here */
+	#define MAKE_CTRL_BUTTON_RELEASE(i,nn,index,p,r) \
+		note_button.reset (new TrackButton ((i), (nn), (index), (p), (r), (*this))); \
 		nn_note_button_map.insert (std::make_pair (note_button->note_number(), note_button)); \
 		id_note_button_map.insert (std::make_pair (note_button->id(), note_button))
 	#define MAKE_SELECT_BUTTON_PRESS(i,cc,index,p) \
@@ -116,29 +121,31 @@ LaunchControlXL::build_maps ()
 			id_note_button_map.insert (std::make_pair (note_button->id(), note_button))
 
 
-	MAKE_TRACK_BUTTON_PRESS(Focus1, 41, 24, YellowLow, &LaunchControlXL::button_track_focus_1);
-	MAKE_TRACK_BUTTON_PRESS(Focus2, 42, 25, YellowLow, &LaunchControlXL::button_track_focus_2);
-	MAKE_TRACK_BUTTON_PRESS(Focus3, 43, 26, YellowLow, &LaunchControlXL::button_track_focus_3);
-	MAKE_TRACK_BUTTON_PRESS(Focus4, 44, 27, YellowLow, &LaunchControlXL::button_track_focus_4);
-	MAKE_TRACK_BUTTON_PRESS(Focus5, 57, 28, YellowLow, &LaunchControlXL::button_track_focus_5);
-	MAKE_TRACK_BUTTON_PRESS(Focus6, 58, 29, YellowLow, &LaunchControlXL::button_track_focus_6);
-	MAKE_TRACK_BUTTON_PRESS(Focus7, 59, 30, YellowLow, &LaunchControlXL::button_track_focus_7);
-	MAKE_TRACK_BUTTON_PRESS(Focus8, 60, 31, YellowLow, &LaunchControlXL::button_track_focus_8);
-	MAKE_TRACK_BUTTON_PRESS(Control1, 73, 32, AmberLow, &LaunchControlXL::button_track_control_1);
-	MAKE_TRACK_BUTTON_PRESS(Control2, 74, 33, AmberLow, &LaunchControlXL::button_track_control_2);
-	MAKE_TRACK_BUTTON_PRESS(Control3, 75, 34, AmberLow, &LaunchControlXL::button_track_control_3);
-	MAKE_TRACK_BUTTON_PRESS(Control4, 76, 35, AmberLow, &LaunchControlXL::button_track_control_4);
-	MAKE_TRACK_BUTTON_PRESS(Control5, 89, 36, AmberLow, &LaunchControlXL::button_track_control_5);
-	MAKE_TRACK_BUTTON_PRESS(Control6, 90, 37, AmberLow, &LaunchControlXL::button_track_control_6);
-	MAKE_TRACK_BUTTON_PRESS(Control7, 91, 38, AmberLow, &LaunchControlXL::button_track_control_7);
-	MAKE_TRACK_BUTTON_PRESS(Control8, 92, 39, AmberLow, &LaunchControlXL::button_track_control_8);
+	MAKE_TRACK_BUTTON_PRESS(Focus1, 41, 24, YellowFull, YellowLow, &LaunchControlXL::button_track_focus_1);
+	MAKE_TRACK_BUTTON_PRESS(Focus2, 42, 25, YellowFull, YellowLow, &LaunchControlXL::button_track_focus_2);
+	MAKE_TRACK_BUTTON_PRESS(Focus3, 43, 26, YellowFull, YellowLow, &LaunchControlXL::button_track_focus_3);
+	MAKE_TRACK_BUTTON_PRESS(Focus4, 44, 27, YellowFull, YellowLow, &LaunchControlXL::button_track_focus_4);
+	MAKE_TRACK_BUTTON_PRESS(Focus5, 57, 28, YellowFull, YellowLow, &LaunchControlXL::button_track_focus_5);
+	MAKE_TRACK_BUTTON_PRESS(Focus6, 58, 29, YellowFull, YellowLow, &LaunchControlXL::button_track_focus_6);
+	MAKE_TRACK_BUTTON_PRESS(Focus7, 59, 30, YellowFull, YellowLow, &LaunchControlXL::button_track_focus_7);
+	MAKE_TRACK_BUTTON_PRESS(Focus8, 60, 31, YellowFull, YellowLow, &LaunchControlXL::button_track_focus_8);
+
+	MAKE_CTRL_BUTTON_RELEASE(Control1, 73, 32, &LaunchControlXL::relax, &LaunchControlXL::button_track_control_1);
+	MAKE_CTRL_BUTTON_RELEASE(Control2, 74, 33, &LaunchControlXL::relax, &LaunchControlXL::button_track_control_2);
+	MAKE_CTRL_BUTTON_RELEASE(Control3, 75, 34, &LaunchControlXL::relax, &LaunchControlXL::button_track_control_3);
+	MAKE_CTRL_BUTTON_RELEASE(Control4, 76, 35, &LaunchControlXL::relax, &LaunchControlXL::button_track_control_4);
+	MAKE_CTRL_BUTTON_RELEASE(Control5, 89, 36, &LaunchControlXL::relax, &LaunchControlXL::button_track_control_5);
+	MAKE_CTRL_BUTTON_RELEASE(Control6, 90, 37, &LaunchControlXL::relax, &LaunchControlXL::button_track_control_6);
+	MAKE_CTRL_BUTTON_RELEASE(Control7, 91, 38, &LaunchControlXL::relax, &LaunchControlXL::button_track_control_7);
+	MAKE_CTRL_BUTTON_RELEASE(Control8, 92, 39, &LaunchControlXL::relax, &LaunchControlXL::button_track_control_8);
 
 	MAKE_SELECT_BUTTON_PRESS(SelectUp, 104, 44, &LaunchControlXL::button_select_up);
 	MAKE_SELECT_BUTTON_PRESS(SelectDown, 105, 45, &LaunchControlXL::button_select_down);
 	MAKE_SELECT_BUTTON_PRESS(SelectLeft, 106, 46, &LaunchControlXL::button_select_left);
 	MAKE_SELECT_BUTTON_PRESS(SelectRight, 107, 47, &LaunchControlXL::button_select_right);
 
-	MAKE_TRACK_STATE_BUTTON_PRESS_RELEASE_LONG(Device, 105, 40, &LaunchControlXL::relax, &LaunchControlXL::button_device, &LaunchControlXL::button_device_long_press);;
+	MAKE_TRACK_STATE_BUTTON_PRESS_RELEASE_LONG(Device, 105, 40, &LaunchControlXL::relax, &LaunchControlXL::button_device,
+			&LaunchControlXL::button_device_long_press);;
 	MAKE_TRACK_STATE_BUTTON_PRESS(Mute, 106, 41, &LaunchControlXL::button_mute);
 	MAKE_TRACK_STATE_BUTTON_PRESS(Solo, 107, 42, &LaunchControlXL::button_solo);
 	MAKE_TRACK_STATE_BUTTON_PRESS(Record, 108, 43, &LaunchControlXL::button_record);
